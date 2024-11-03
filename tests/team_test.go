@@ -1,8 +1,9 @@
 package coolify_sdk_test
 
 import (
-	sdk "coolify-sdk"
 	"testing"
+
+	sdk "github.com/marconneves/coolify-sdk-go"
 )
 
 func TestListTeam(t *testing.T) {
