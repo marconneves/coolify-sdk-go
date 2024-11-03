@@ -2,10 +2,8 @@ package database
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 
 	"github.com/marconneves/coolify-sdk-go/client"
 	"github.com/marconneves/coolify-sdk-go/server"
@@ -111,7 +109,7 @@ func (d *DatabaseInstance) List() (*[]Database, error) {
 		return nil, err
 	}
 
-	return decodeResponse(body, &[]Database{})
+	return client.DecodeResponse(body, &[]Database{})
 }
 
 func (d *DatabaseInstance) Get(uuid string) (*Database, error) {
@@ -124,7 +122,7 @@ func (d *DatabaseInstance) Get(uuid string) (*Database, error) {
 		return nil, err
 	}
 
-	return decodeResponse(body, &Database{})
+	return client.DecodeResponse(body, &Database{})
 }
 
 func (d *DatabaseInstance) Start(uuid string) error {
@@ -220,30 +218,10 @@ func (d *DatabaseInstance) Update(uuid string, data *UpdateDatabaseDTO) error {
 	if uuid == "" {
 		return errors.New("UUID is required")
 	}
-	buf, err := encodeRequest(data)
+	buf, err := client.EncodeRequest(data)
 	if err != nil {
 		return err
 	}
 	_, err = d.client.HttpRequest(fmt.Sprintf("databases/%v", uuid), "PATCH", *buf)
 	return err
-}
-
-func decodeResponse[T any](body io.ReadCloser, target *T) (*T, error) {
-	err := json.NewDecoder(body).Decode(target)
-	if err != nil {
-		return nil, err
-	}
-
-	return target, nil
-}
-
-func encodeRequest[T any](target *T) (*bytes.Buffer, error) {
-	buf := &bytes.Buffer{}
-
-	err := json.NewEncoder(buf).Encode(target)
-	if err != nil {
-		return nil, err
-	}
-
-	return buf, nil
 }
