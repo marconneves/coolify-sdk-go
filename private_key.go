@@ -44,6 +44,35 @@ func (t *PrivateKeyInstance) Get(uuid string) (*PrivateKey, error) {
 	return decodeResponse(body, &PrivateKey{})
 }
 
+type CreatePrivateKeyDTO struct {
+	Description *string `json:"description,omitempty"`
+	Name        *string `json:"name,omitempty"`
+	PrivateKey  string  `json:"private_key"`
+}
+
+type CreatePrivateKeyResponse struct {
+	UUID string `json:"uuid"`
+}
+
+func (t *PrivateKeyInstance) Create(server *CreatePrivateKeyDTO) (*string, error) {
+	buf, err := encodeRequest(server)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := t.client.httpRequest("security/keys", "POST", *buf)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := decodeResponse(body, &CreatePrivateKeyResponse{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.UUID, nil
+}
+
 func (t *PrivateKeyInstance) Delete(uuid string) error {
 	if uuid == "" {
 		return errors.New("uuid is required")
@@ -55,4 +84,24 @@ func (t *PrivateKeyInstance) Delete(uuid string) error {
 	}
 
 	return nil
+}
+
+type UpdatePrivateKeyDTO struct {
+	Description *string `json:"description,omitempty"`
+	Name        *string `json:"name,omitempty"`
+	PrivateKey  string  `json:"private_key"`
+}
+
+func (t *PrivateKeyInstance) Update(uuid string, privateKey *UpdatePrivateKeyDTO) error {
+	if uuid == "" {
+		return errors.New("uuid is required")
+	}
+
+	buf, err := encodeRequest(privateKey)
+	if err != nil {
+		return err
+	}
+
+	_, err = t.client.httpRequest(fmt.Sprintf("security/keys/%v", uuid), "PATCH", *buf)
+	return err
 }
