@@ -175,10 +175,10 @@ Este SDK utiliza o pacote `net/http` do Go para fazer solicitações HTTP à API
 - `hostname`: URL da API do Coolify.
 - `apiToken`: Token de autenticação para acesso à API.
 
-O método `httpRequest` é utilizado para fazer as requisições HTTP internamente. Abaixo está um exemplo do método `httpRequest` que pode ser implementado no SDK:
+O método `HttpRequest` é utilizado para fazer as requisições HTTP internamente. Abaixo está um exemplo do método `HttpRequest` que pode ser implementado no SDK:
 
 ```go
-func (c *Client) httpRequest(endpoint, method string, body interface{}) (*http.Response, error) {
+func (c *Client) HttpRequest(endpoint, method string, body interface{}) (*http.Response, error) {
     url := fmt.Sprintf("%s/%s", c.hostname, endpoint)
     var buf bytes.Buffer
     if body != nil {

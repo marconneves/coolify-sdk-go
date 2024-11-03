@@ -2,22 +2,20 @@ package coolify_sdk
 
 import (
 	"encoding/json"
+
+	client "github.com/marconneves/coolify-sdk-go/client"
 )
 
-type Api struct {
-	client *Client
-}
-
-func (c *Client) Api() *Api {
-	return &Api{client: c}
+type ApiInstance struct {
+	client *client.Client
 }
 
 type EnableApiResponse struct {
 	Message string `json:"message"`
 }
 
-func (a *Api) Enable() (*string, error) {
-	body, err := a.client.httpRequest("enable", "GET")
+func (a *ApiInstance) Enable() (*string, error) {
+	body, err := a.client.HttpRequest("enable", "GET")
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +36,8 @@ func (a *Api) Enable() (*string, error) {
 	return &apiEnabled, nil
 }
 
-func (a *Api) Disable() (*string, error) {
-	body, err := a.client.httpRequest("disable", "GET")
+func (a *ApiInstance) Disable() (*string, error) {
+	body, err := a.client.HttpRequest("disable", "GET")
 	if err != nil {
 		return nil, err
 	}

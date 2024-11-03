@@ -26,7 +26,7 @@ func TestListTeam(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(testComponent.Host, testComponent.ApiKey)
+			var client = sdk.Init(testComponent.Host, testComponent.ApiKey)
 
 			_, errors := client.Team.List()
 
@@ -68,7 +68,7 @@ func TestGetTeam(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(testComponent.Host, testComponent.ApiKey)
+			var client = sdk.Init(testComponent.Host, testComponent.ApiKey)
 
 			_, errors := client.Team.Get(testComponent.Id)
 
@@ -110,7 +110,7 @@ func TestGetTeamMembers(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(testComponent.Host, testComponent.ApiKey)
+			var client = sdk.Init(testComponent.Host, testComponent.ApiKey)
 
 			_, errors := client.Team.Members(testComponent.Id)
 

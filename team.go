@@ -1,13 +1,14 @@
 package coolify_sdk
 
 import (
-	"bytes"
 	"fmt"
 	"time"
+
+	client "github.com/marconneves/coolify-sdk-go/client"
 )
 
 type TeamInstance struct {
-	client *Client
+	client *client.Client
 }
 
 type Team struct {
@@ -19,21 +20,21 @@ type Team struct {
 }
 
 func (t *TeamInstance) List() (*[]Team, error) {
-	body, err := t.client.httpRequest("teams", "GET", bytes.Buffer{})
+	body, err := t.client.HttpRequest("teams", "GET")
 	if err != nil {
 		return nil, err
 	}
 
-	return decodeResponse(body, &[]Team{})
+	return client.DecodeResponse(body, &[]Team{})
 }
 
 func (t *TeamInstance) Get(id int) (*Team, error) {
-	body, err := t.client.httpRequest(fmt.Sprintf("teams/%v", id), "GET", bytes.Buffer{})
+	body, err := t.client.HttpRequest(fmt.Sprintf("teams/%v", id), "GET")
 	if err != nil {
 		return nil, err
 	}
 
-	return decodeResponse(body, &Team{})
+	return client.DecodeResponse(body, &Team{})
 }
 
 type Member struct {
@@ -49,10 +50,10 @@ type Member struct {
 }
 
 func (t *TeamInstance) Members(id int) (*[]Member, error) {
-	body, err := t.client.httpRequest(fmt.Sprintf("teams/%v/members", id), "GET", bytes.Buffer{})
+	body, err := t.client.HttpRequest(fmt.Sprintf("teams/%v/members", id), "GET")
 	if err != nil {
 		return nil, err
 	}
 
-	return decodeResponse(body, &[]Member{})
+	return client.DecodeResponse(body, &[]Member{})
 }

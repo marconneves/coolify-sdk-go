@@ -1,40 +1,41 @@
 package coolify_sdk
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"time"
+
+	client "github.com/marconneves/coolify-sdk-go/client"
 )
 
 type ProjectInstance struct {
-	client *Client
+	client *client.Client
 }
 
 type Project struct {
-	Description  *string       `json:"description,omitempty"`
-	Environments []Environment `json:"environments,omitempty"`
-	ID           *int64        `json:"id,omitempty"`
-	Name         *string       `json:"name,omitempty"`
-	UUID         *string       `json:"uuid,omitempty"`
+	ID           int64         `json:"id"`
+	UUID         string        `json:"uuid"`
+	Name         string        `json:"name"`
+	Description  *string       `json:"description"`
+	Environments []Environment `json:"environments"`
 }
 
 type Environment struct {
-	CreatedAt   *string `json:"created_at,omitempty"`
-	Description *string `json:"description,omitempty"`
-	ID          *int64  `json:"id,omitempty"`
-	Name        *string `json:"name,omitempty"`
-	ProjectID   *int64  `json:"project_id,omitempty"`
-	UpdatedAt   *string `json:"updated_at,omitempty"`
+	ID          int64     `json:"id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+	ProjectId   int64     `json:"project_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 func (t *ProjectInstance) List() (*[]Project, error) {
-	body, err := t.client.httpRequest("projects", "GET", bytes.Buffer{})
+	body, err := t.client.HttpRequest("projects", "GET")
 	if err != nil {
 		return nil, err
 	}
 
-	return decodeResponse(body, &[]Project{})
+	return client.DecodeResponse(body, &[]Project{})
 }
 
 func (t *ProjectInstance) Get(uuid string) (*Project, error) {
@@ -42,12 +43,12 @@ func (t *ProjectInstance) Get(uuid string) (*Project, error) {
 		return nil, errors.New("uuid is required")
 	}
 
-	body, err := t.client.httpRequest(fmt.Sprintf("projects/%v", uuid), "GET", bytes.Buffer{})
+	body, err := t.client.HttpRequest(fmt.Sprintf("projects/%v", uuid), "GET")
 	if err != nil {
 		return nil, err
 	}
 
-	return decodeResponse(body, &Project{})
+	return client.DecodeResponse(body, &Project{})
 }
 
 type CreateProjectDTO struct {
@@ -60,17 +61,17 @@ type CreateProjectResponse struct {
 }
 
 func (t *ProjectInstance) Create(server *CreateProjectDTO) (*string, error) {
-	buf, err := encodeRequest(server)
+	buf, err := client.EncodeRequest(server)
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := t.client.httpRequest("projects", "POST", *buf)
+	body, err := t.client.HttpRequest("projects", "POST", *buf)
 	if err != nil {
 		return nil, err
 	}
 
-	response, err := decodeResponse(body, &CreateProjectResponse{})
+	response, err := client.DecodeResponse(body, &CreateProjectResponse{})
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +84,7 @@ func (t *ProjectInstance) Delete(uuid string) error {
 		return errors.New("uuid is required")
 	}
 
-	_, err := t.client.httpRequest(fmt.Sprintf("projects/%v", uuid), "DELETE")
+	_, err := t.client.HttpRequest(fmt.Sprintf("projects/%v", uuid), "DELETE")
 	if err != nil {
 		return err
 	}
@@ -101,12 +102,12 @@ func (t *ProjectInstance) Update(uuid string, server *UpdateProjectDTO) error {
 		return errors.New("uuid is required")
 	}
 
-	buf, err := encodeRequest(server)
+	buf, err := client.EncodeRequest(server)
 	if err != nil {
 		return err
 	}
 
-	_, err = t.client.httpRequest(fmt.Sprintf("projects/%v", uuid), "PATCH", *buf)
+	_, err = t.client.HttpRequest(fmt.Sprintf("projects/%v", uuid), "PATCH", *buf)
 	return err
 }
 
@@ -125,10 +126,10 @@ func (t *ProjectInstance) Resources(uuid string, environment string) (*[]Environ
 		return nil, errors.New("uuid is required")
 	}
 
-	body, err := t.client.httpRequest(fmt.Sprintf("projects/%v/%v/", uuid, environment), "GET", bytes.Buffer{})
+	body, err := t.client.HttpRequest(fmt.Sprintf("projects/%v/%v/", uuid, environment), "GET")
 	if err != nil {
 		return nil, err
 	}
 
-	return decodeResponse(body, &[]EnvironmentData{})
+	return client.DecodeResponse(body, &[]EnvironmentData{})
 }

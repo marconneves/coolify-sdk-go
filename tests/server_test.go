@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	sdk "github.com/marconneves/coolify-sdk-go"
+	server "github.com/marconneves/coolify-sdk-go/server"
 )
 
 func TestListServer(t *testing.T) {
@@ -26,7 +27,7 @@ func TestListServer(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(testComponent.Host, testComponent.ApiKey)
+			var client = sdk.Init(testComponent.Host, testComponent.ApiKey)
 
 			_, errors := client.Server.List()
 
@@ -68,7 +69,7 @@ func TestGetServer(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(testComponent.Host, testComponent.ApiKey)
+			var client = sdk.Init(testComponent.Host, testComponent.ApiKey)
 
 			_, errors := client.Server.Get(testComponent.UUID)
 
@@ -83,11 +84,11 @@ func TestGetServer(t *testing.T) {
 
 func TestCreateServer(t *testing.T) {
 	cases := map[string]struct {
-		Server *sdk.CreateServerDTO
+		Server *server.CreateServerDTO
 		Error  bool
 	}{
 		"ValidServer": {
-			Server: &sdk.CreateServerDTO{
+			Server: &server.CreateServerDTO{
 				Name:            "My Server",
 				Description:     "My Server Description",
 				IP:              "127.0.0.1",
@@ -100,7 +101,7 @@ func TestCreateServer(t *testing.T) {
 			Error: false,
 		},
 		"MissingName": {
-			Server: &sdk.CreateServerDTO{
+			Server: &server.CreateServerDTO{
 				Description:     "No Name Server",
 				IP:              "127.0.0.1",
 				Port:            22,
@@ -112,7 +113,7 @@ func TestCreateServer(t *testing.T) {
 			Error: true,
 		},
 		"InvalidPrivateKey": {
-			Server: &sdk.CreateServerDTO{
+			Server: &server.CreateServerDTO{
 				Name:            "No PrivateKey UUID Valid",
 				Description:     "Invalid IP",
 				IP:              "127.0.0.1",
@@ -128,7 +129,7 @@ func TestCreateServer(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(host, apiKey)
+			var client = sdk.Init(host, apiKey)
 
 			uuid, errors := client.Server.Create(testComponent.Server)
 
@@ -144,12 +145,12 @@ func TestCreateServer(t *testing.T) {
 func TestUpdateServer(t *testing.T) {
 	cases := map[string]struct {
 		UUID   string
-		Server *sdk.UpdateServerDTO
+		Server *server.UpdateServerDTO
 		Error  bool
 	}{
 		"ValidUpdate": {
 			UUID: "lcs8ggw8cos48kw0sc0sk0gc",
-			Server: &sdk.UpdateServerDTO{
+			Server: &server.UpdateServerDTO{
 				Name:        "Updated Server",
 				Description: "Updated Description",
 				IP:          "192.168.1.1",
@@ -160,7 +161,7 @@ func TestUpdateServer(t *testing.T) {
 		},
 		"InvalidUUID": {
 			UUID: "",
-			Server: &sdk.UpdateServerDTO{
+			Server: &server.UpdateServerDTO{
 				Name:        "Updated Server",
 				Description: "Updated Description",
 				IP:          "192.168.1.1",
@@ -173,7 +174,7 @@ func TestUpdateServer(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(host, apiKey)
+			var client = sdk.Init(host, apiKey)
 
 			errors := client.Server.Update(testComponent.UUID, testComponent.Server)
 
@@ -203,7 +204,7 @@ func TestDeleteServer(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(host, apiKey)
+			var client = sdk.Init(host, apiKey)
 
 			errors := client.Server.Delete(testComponent.UUID)
 
@@ -233,7 +234,7 @@ func TestListDomains(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(host, apiKey)
+			var client = sdk.Init(host, apiKey)
 
 			_, errors := client.Server.Domains(testComponent.UUID)
 
@@ -265,7 +266,7 @@ func TestListResources(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(host, apiKey)
+			var client = sdk.Init(host, apiKey)
 
 			_, errors := client.Server.Resources(testComponent.UUID)
 

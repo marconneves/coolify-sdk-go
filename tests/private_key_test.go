@@ -26,7 +26,7 @@ func TestListPrivateKey(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(testComponent.Host, testComponent.ApiKey)
+			var client = sdk.Init(testComponent.Host, testComponent.ApiKey)
 
 			_, errors := client.PrivateKey.List()
 
@@ -56,7 +56,7 @@ func TestGetPrivateKey(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(host, apiKey)
+			var client = sdk.Init(host, apiKey)
 
 			_, errors := client.PrivateKey.Get(testComponent.UUID)
 
@@ -76,7 +76,7 @@ func TestCreatePrivateKey(t *testing.T) {
 	}{
 		"ValidRequest": {
 			DTO: sdk.CreatePrivateKeyDTO{
-				Name:        stringPtr("Test Key"),
+				Name:        "Test Key",
 				Description: stringPtr("A test private key"),
 				PrivateKey:  "private-key-content",
 			},
@@ -84,7 +84,7 @@ func TestCreatePrivateKey(t *testing.T) {
 		},
 		"MissingPrivateKey": {
 			DTO: sdk.CreatePrivateKeyDTO{
-				Name:        stringPtr("Test Key"),
+				Name:        "Test Key",
 				Description: stringPtr("A test private key"),
 			},
 			Error: true,
@@ -93,7 +93,7 @@ func TestCreatePrivateKey(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(host, apiKey)
+			var client = sdk.Init(host, apiKey)
 
 			_, errors := client.PrivateKey.Create(&testComponent.DTO)
 
@@ -117,7 +117,7 @@ func TestUpdatePrivateKey(t *testing.T) {
 			DTO: sdk.UpdatePrivateKeyDTO{
 				Name:        stringPtr("Updated Key"),
 				Description: stringPtr("An updated private key"),
-				PrivateKey:  "updated-private-key-content",
+				PrivateKey:  stringPtr("updated-private-key-content"),
 			},
 			Error: false,
 		},
@@ -126,7 +126,7 @@ func TestUpdatePrivateKey(t *testing.T) {
 			DTO: sdk.UpdatePrivateKeyDTO{
 				Name:        stringPtr("Updated Key"),
 				Description: stringPtr("An updated private key"),
-				PrivateKey:  "updated-private-key-content",
+				PrivateKey:  stringPtr("updated-private-key-content"),
 			},
 			Error: true,
 		},
@@ -134,7 +134,7 @@ func TestUpdatePrivateKey(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(host, apiKey)
+			var client = sdk.Init(host, apiKey)
 
 			errors := client.PrivateKey.Update(testComponent.UUID, &testComponent.DTO)
 
@@ -164,7 +164,7 @@ func TestDeletePrivateKey(t *testing.T) {
 
 	for testName, testComponent := range cases {
 		t.Run(testName, func(t *testing.T) {
-			var client = sdk.NewClient(host, apiKey)
+			var client = sdk.Init(host, apiKey)
 
 			errors := client.PrivateKey.Delete(testComponent.UUID)
 

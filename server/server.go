@@ -1,44 +1,49 @@
-package coolify_sdk
+package server
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/marconneves/coolify-sdk-go/client"
 )
 
 type ServerInstance struct {
-	client *Client
+	client *client.Client
+}
+
+func NewServer(client *client.Client) *ServerInstance {
+	return &ServerInstance{client: client}
 }
 
 type Server struct {
-	UUID                          string         `json:"uuid"`
-	Name                          string         `json:"name"`
-	Description                   *string        `json:"description"`
-	HighDiskUsageNotificationSent bool           `json:"high_disk_usage_notification_sent"`
-	IP                            string         `json:"ip"`
-	LogDrainNotificationSent      bool           `json:"log_drain_notification_sent"`
-	Port                          string         `json:"port"`
-	PrivateKeyID                  int            `json:"private_key_id"`
-	Proxy                         *Proxy         `json:"proxy"`
-	Settings                      ServerSettings `json:"settings"`
-	SwarmCluster                  *string        `json:"swarm_cluster"`
-	TeamID                        int            `json:"team_id"`
-	UnreachableCount              int            `json:"unreachable_count"`
-	UnreachableNotificationSent   bool           `json:"unreachable_notification_sent"`
-	User                          string         `json:"user"`
-	ValidationLogs                *string        `json:"validation_logs"`
-	CreatedAt                     time.Time      `json:"created_at"`
-	UpdatedAt                     time.Time      `json:"updated_at"`
+	IP                            string    `json:"ip"`
+	UUID                          string    `json:"uuid"`
+	Name                          string    `json:"name"`
+	Description                   *string   `json:"description"`
+	HighDiskUsageNotificationSent bool      `json:"high_disk_usage_notification_sent"`
+	LogDrainNotificationSent      bool      `json:"log_drain_notification_sent"`
+	Port                          string    `json:"port"`
+	PrivateKeyID                  int       `json:"private_key_id"`
+	Proxy                         *Proxy    `json:"proxy"`
+	Settings                      Settings  `json:"settings"`
+	SwarmCluster                  *string   `json:"swarm_cluster"`
+	TeamID                        int       `json:"team_id"`
+	UnreachableCount              int       `json:"unreachable_count"`
+	UnreachableNotificationSent   bool      `json:"unreachable_notification_sent"`
+	User                          string    `json:"user"`
+	ValidationLogs                *string   `json:"validation_logs"`
+	CreatedAt                     time.Time `json:"created_at"`
+	UpdatedAt                     time.Time `json:"updated_at"`
 }
 
 type Proxy struct {
+	ForceStop bool   `json:"force_stop"`
 	Status    string `json:"status"`
 	Type      string `json:"type"`
-	ForceStop bool   `json:"force_stop"`
 }
 
-type ServerSettings struct {
+type Settings struct {
 	Id                         int       `json:"id"`
 	ConcurrentBuilds           int       `json:"concurrent_builds"`
 	DeleteUnusedNetworks       bool      `json:"delete_unused_networks"`
@@ -80,12 +85,12 @@ type ServerSettings struct {
 }
 
 func (t *ServerInstance) List() (*[]Server, error) {
-	body, err := t.client.httpRequest("servers", "GET", bytes.Buffer{})
+	body, err := t.client.HttpRequest("servers", "GET")
 	if err != nil {
 		return nil, err
 	}
 
-	return decodeResponse(body, &[]Server{})
+	return client.DecodeResponse(body, &[]Server{})
 }
 
 func (t *ServerInstance) Get(uuid string) (*Server, error) {
@@ -93,12 +98,12 @@ func (t *ServerInstance) Get(uuid string) (*Server, error) {
 		return nil, errors.New("uuid is required")
 	}
 
-	body, err := t.client.httpRequest(fmt.Sprintf("servers/%v", uuid), "GET", bytes.Buffer{})
+	body, err := t.client.HttpRequest(fmt.Sprintf("servers/%v", uuid), "GET")
 	if err != nil {
 		return nil, err
 	}
 
-	return decodeResponse(body, &Server{})
+	return client.DecodeResponse(body, &Server{})
 }
 
 type CreateServerDTO struct {
@@ -117,17 +122,17 @@ type CreateServerResponse struct {
 }
 
 func (t *ServerInstance) Create(server *CreateServerDTO) (*string, error) {
-	buf, err := encodeRequest(server)
+	buf, err := client.EncodeRequest(server)
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := t.client.httpRequest("servers", "POST", *buf)
+	body, err := t.client.HttpRequest("servers", "POST", *buf)
 	if err != nil {
 		return nil, err
 	}
 
-	response, err := decodeResponse(body, &CreateServerResponse{})
+	response, err := client.DecodeResponse(body, &CreateServerResponse{})
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +145,7 @@ func (t *ServerInstance) Delete(uuid string) error {
 		return errors.New("uuid is required")
 	}
 
-	_, err := t.client.httpRequest(fmt.Sprintf("servers/%v", uuid), "DELETE")
+	_, err := t.client.HttpRequest(fmt.Sprintf("servers/%v", uuid), "DELETE")
 	if err != nil {
 		return err
 	}
@@ -149,14 +154,14 @@ func (t *ServerInstance) Delete(uuid string) error {
 }
 
 type UpdateServerDTO struct {
-	Name            string `json:"name"`
-	Description     string `json:"description"`
-	IP              string `json:"ip"`
-	Port            int    `json:"port"`
-	User            string `json:"user"`
-	PrivateKeyUUID  string `json:"private_key_uuid"`
-	IsBuildServer   bool   `json:"is_build_server"`
-	InstantValidate bool   `json:"instant_validate"`
+	Name            string `json:"name,omitempty"`
+	Description     string `json:"description,omitempty"`
+	IP              string `json:"ip,omitempty"`
+	Port            int    `json:"port,omitempty"`
+	User            string `json:"user,omitempty"`
+	PrivateKeyUUID  string `json:"private_key_uuid,omitempty"`
+	IsBuildServer   bool   `json:"is_build_server,omitempty"`
+	InstantValidate bool   `json:"instant_validate,omitempty"`
 }
 
 func (t *ServerInstance) Update(uuid string, server *UpdateServerDTO) error {
@@ -164,12 +169,12 @@ func (t *ServerInstance) Update(uuid string, server *UpdateServerDTO) error {
 		return errors.New("uuid is required")
 	}
 
-	buf, err := encodeRequest(server)
+	buf, err := client.EncodeRequest(server)
 	if err != nil {
 		return err
 	}
 
-	_, err = t.client.httpRequest(fmt.Sprintf("servers/%v", uuid), "PATCH", *buf)
+	_, err = t.client.HttpRequest(fmt.Sprintf("servers/%v", uuid), "PATCH", *buf)
 	return err
 }
 
@@ -188,12 +193,12 @@ func (t *ServerInstance) Resources(uuid string) (*[]Resource, error) {
 		return nil, errors.New("uuid is required")
 	}
 
-	body, err := t.client.httpRequest(fmt.Sprintf("servers/%v/resources", uuid), "GET", bytes.Buffer{})
+	body, err := t.client.HttpRequest(fmt.Sprintf("servers/%v/resources", uuid), "GET")
 	if err != nil {
 		return nil, err
 	}
 
-	return decodeResponse(body, &[]Resource{})
+	return client.DecodeResponse(body, &[]Resource{})
 }
 
 type Domain struct {
@@ -206,12 +211,12 @@ func (t *ServerInstance) Domains(uuid string) (*[]Domain, error) {
 		return nil, errors.New("uuid is required")
 	}
 
-	body, err := t.client.httpRequest(fmt.Sprintf("servers/%v/domains", uuid), "GET", bytes.Buffer{})
+	body, err := t.client.HttpRequest(fmt.Sprintf("servers/%v/domains", uuid), "GET")
 	if err != nil {
 		return nil, err
 	}
 
-	return decodeResponse(body, &[]Domain{})
+	return client.DecodeResponse(body, &[]Domain{})
 }
 
 func (t *ServerInstance) Validate(uuid string) error {
@@ -219,7 +224,7 @@ func (t *ServerInstance) Validate(uuid string) error {
 		return errors.New("uuid is required")
 	}
 
-	_, err := t.client.httpRequest(fmt.Sprintf("servers/%v/validate", uuid), "GET", bytes.Buffer{})
+	_, err := t.client.HttpRequest(fmt.Sprintf("servers/%v/validate", uuid), "GET")
 	if err != nil {
 		return err
 	}
