@@ -2,7 +2,7 @@ package database
 
 import "github.com/marconneves/coolify-sdk-go/client"
 
-type CreateDatabaseDTO struct {
+type CreateDatabasePostgresDTO struct {
 	ServerUUID      string  `json:"server_uuid"`
 	ProjectUUID     string  `json:"project_uuid"`
 	Environment     string  `json:"environment_name"`
@@ -34,7 +34,7 @@ type CreateDatabaseResponse struct {
 	UUID string `json:"uuid"`
 }
 
-func (d *DatabaseInstance) CreatePostgreSQL(data *CreateDatabaseDTO) (*string, error) {
+func (d *DatabaseInstance) CreatePostgreSQL(data *CreateDatabasePostgresDTO) (*string, error) {
 	buf, err := client.EncodeRequest(data)
 	if err != nil {
 		return nil, err
