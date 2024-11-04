@@ -1,3 +1,3 @@
 module github.com/marconneves/coolify-sdk-go
 
-go 1.19
+go 1.23.2
