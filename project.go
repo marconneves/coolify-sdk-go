@@ -112,13 +112,12 @@ func (t *ProjectInstance) Update(uuid string, server *UpdateProjectDTO) error {
 }
 
 type EnvironmentData struct {
-	Id        int       `json:"id"`
-	UUID      string    `json:"uuid"`
-	Name      string    `json:"name"`
-	Type      string    `json:"type"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Status    string    `json:"status"`
+	Id          int       `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Status      string    `json:"status"`
 }
 
 func (t *ProjectInstance) Environment(uuid string, environment string) (*[]EnvironmentData, error) {
