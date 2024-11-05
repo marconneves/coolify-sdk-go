@@ -121,7 +121,7 @@ type EnvironmentData struct {
 	Status    string    `json:"status"`
 }
 
-func (t *ProjectInstance) Resources(uuid string, environment string) (*[]EnvironmentData, error) {
+func (t *ProjectInstance) Environment(uuid string, environment string) (*[]EnvironmentData, error) {
 	if uuid == "" {
 		return nil, errors.New("uuid is required")
 	}
