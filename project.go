@@ -120,7 +120,7 @@ type EnvironmentData struct {
 	Status      string    `json:"status"`
 }
 
-func (t *ProjectInstance) Environment(uuid string, environment string) (*[]EnvironmentData, error) {
+func (t *ProjectInstance) Environment(uuid string, environment string) (*EnvironmentData, error) {
 	if uuid == "" {
 		return nil, errors.New("uuid is required")
 	}
@@ -130,5 +130,5 @@ func (t *ProjectInstance) Environment(uuid string, environment string) (*[]Envir
 		return nil, err
 	}
 
-	return client.DecodeResponse(body, &[]EnvironmentData{})
+	return client.DecodeResponse(body, &EnvironmentData{})
 }
