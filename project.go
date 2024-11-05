@@ -112,7 +112,7 @@ func (t *ProjectInstance) Update(uuid string, server *UpdateProjectDTO) error {
 }
 
 type EnvironmentData struct {
-	Id          int       `json:"id"`
+	Id          int64     `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	ProjectID   int64     `json:"project_id"`
