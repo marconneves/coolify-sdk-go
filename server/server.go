@@ -26,7 +26,7 @@ type Server struct {
 	Port                          string    `json:"port"`
 	PrivateKeyID                  int       `json:"private_key_id"`
 	Proxy                         *Proxy    `json:"proxy"`
-	Settings                      Settings  `json:"settings"`
+	Settings                      *Settings `json:"settings"`
 	SwarmCluster                  *string   `json:"swarm_cluster"`
 	TeamID                        int       `json:"team_id"`
 	UnreachableCount              int       `json:"unreachable_count"`
