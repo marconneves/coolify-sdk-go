@@ -112,16 +112,15 @@ func (t *ProjectInstance) Update(uuid string, server *UpdateProjectDTO) error {
 }
 
 type EnvironmentData struct {
-	Id        int       `json:"id"`
-	UUID      string    `json:"uuid"`
-	Name      string    `json:"name"`
-	Type      string    `json:"type"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Status    string    `json:"status"`
+	Id          int64     `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	ProjectID   int64     `json:"project_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-func (t *ProjectInstance) Environment(uuid string, environment string) (*[]EnvironmentData, error) {
+func (t *ProjectInstance) Environment(uuid string, environment string) (*EnvironmentData, error) {
 	if uuid == "" {
 		return nil, errors.New("uuid is required")
 	}
@@ -131,5 +130,5 @@ func (t *ProjectInstance) Environment(uuid string, environment string) (*[]Envir
 		return nil, err
 	}
 
-	return client.DecodeResponse(body, &[]EnvironmentData{})
+	return client.DecodeResponse(body, &EnvironmentData{})
 }

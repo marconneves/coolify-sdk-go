@@ -145,7 +145,7 @@ func (d *DatabaseInstance) Stop(uuid string) error {
 	return err
 }
 
-func (d *DatabaseInstance) RestartDatabase(uuid string) error {
+func (d *DatabaseInstance) Restart(uuid string) error {
 	if uuid == "" {
 		return errors.New("UUID is required")
 	}

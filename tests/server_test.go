@@ -278,3 +278,33 @@ func TestListResources(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateServer(t *testing.T) {
+	cases := map[string]struct {
+		UUID  string
+		Error bool
+	}{
+		"ValidUUID": {
+			UUID:  "lo4sksgsks8kw8w0skog8c0s",
+			Error: false,
+		},
+		"InvalidUUID": {
+			UUID:  "",
+			Error: true,
+		},
+	}
+
+	for testName, testComponent := range cases {
+		t.Run(testName, func(t *testing.T) {
+			var client = sdk.Init(host, apiKey)
+
+			errors := client.Server.Validate(testComponent.UUID)
+
+			if errors != nil && !testComponent.Error {
+				t.Errorf("Server validation failed unexpectedly: %v", errors)
+			} else if errors == nil && testComponent.Error {
+				t.Errorf("Server validation succeeded unexpectedly")
+			}
+		})
+	}
+}

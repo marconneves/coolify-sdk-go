@@ -78,7 +78,7 @@ func TestCreatePrivateKey(t *testing.T) {
 			DTO: sdk.CreatePrivateKeyDTO{
 				Name:        "Test Key",
 				Description: stringPtr("A test private key"),
-				PrivateKey:  "private-key-content",
+				PrivateKey:  "MIICWwIBAAKBgQC2B3b09WW8oKeVtYt7sqHs+1Ce7Kbgf60yj+DO6QU7okmpV8QU2jkjLWuAM4awKrBMuI2s5aQ62DaCXrP0k4xvdvSxhz5GrSHuvU4tn6a4TWK3nMqZE9yZYXRdpfPBf3+XHUAHY8FLJlMu49+uY7h6WxoKANDkJ1VMUBsFi7qJSQIDAQABAoGAAeLL6bfNKQolElkCK/Lq2JC2Ah+Djxnjin2RH7OsWTTSPI3rOygTpXin/3kJMTQQBYt39E2gyPdKgUlH5gXNU6nSfL3MZFMok8V9y3m73NETVQn489W7F0ykTqu5xBBt8YdbMhxjviEtzLVUlR2O6sL6aHihQV016N61Q/+ash0CQQDtidFHc20vYHGsES8fVsR5k8WtNfNkW5EDoQJHlkrF1M+2GlHAeZ0T47jfnzNwHtmv6qz+4uyhpyT995A7DJfTAkEAxC01WWE8cPlQjXFpwQh8tfee4CA4Fza/UwpI4cg9uIh8Qw6I7ZvwFLlmgnIUWQHxZD2FVbtyojshbr3Fq6hk8wJAT5rPKt3Q6n6suZhsrVj7sS7HoXuiHLDfEVNFG06PsmrWTVXWreVTsdWwICkPKPT9yQmhfi34VVhZek8b494dhwJAHYVID+kn9UAvNPmqFlg2nBNlHwj6J9QfOlnD2eYOE6TGPjkDte3PVO8JU/viv/og3xq648nPWEZZo5Z/FnPCrQJAZA3BGbng4Hx1ECUZlTYZ8q0xMaIoqjWDZd2Mf5ZwMmQ9uhyWIDkqrVgMNEwdK6AtI5twmqg/VHoKG9RSbkMSiw==",
 			},
 			Error: false,
 		},
@@ -175,8 +175,4 @@ func TestDeletePrivateKey(t *testing.T) {
 			}
 		})
 	}
-}
-
-func stringPtr(s string) *string {
-	return &s
 }
