@@ -62,9 +62,3 @@ func (c *Sdk) HeathCheck() (*string, error) {
 
 	return &healCheckResponse, nil
 }
-
-type CreateServerDTO = server.CreateServerDTO
-type UpdateServerDTO = server.UpdateServerDTO
-
-type UpdateDatabaseDTO = database.UpdateDatabaseDTO
-type CreateDatabasePostgresDTO = database.CreateDatabasePostgresDTO
