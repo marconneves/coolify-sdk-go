@@ -1,7 +1,7 @@
 package coolify_sdk_test
 
 var host = "https://cloud.ferramenta.digital"
-var apiKey = "2|KW6agoFYngIF6uTtW4NV6EqXuVCtIQpPSWqzc1UM03428da4"
+var apiKey = "3|Tt6iybaozpfPZojdlK5gGGotoxK8Cn1u1xTUCe2T1e65744d"
 
 func stringPtr(s string) *string {
 	return &s

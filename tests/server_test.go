@@ -50,7 +50,7 @@ func TestGetServer(t *testing.T) {
 		"ValidRequest": {
 			Host:   host,
 			ApiKey: apiKey,
-			UUID:   "lo4sksgsks8kw8w0skog8c0s",
+			UUID:   "ykwgwcg0cgk8owsk4gg8wwo4",
 			Error:  false,
 		},
 		"WithInvalidId": {

@@ -1,8 +1,10 @@
 package server
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/marconneves/coolify-sdk-go/client"
@@ -84,6 +86,38 @@ type Settings struct {
 	UpdatedAt                  time.Time `json:"updated_at"`
 }
 
+func (t *ServerInstance) DecodeServerResponse(body io.ReadCloser) (*Server, error) {
+	defer body.Close()
+
+	data, err := io.ReadAll(body)
+	if err != nil {
+		return nil, err
+	}
+
+	var raw map[string]interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return nil, err
+	}
+
+	if proxy, exists := raw["proxy"]; exists {
+		if arr, ok := proxy.([]interface{}); ok && len(arr) == 0 {
+			delete(raw, "proxy")
+		}
+	}
+
+	adjustedData, err := json.Marshal(raw)
+	if err != nil {
+		return nil, err
+	}
+
+	var server Server
+	if err := json.Unmarshal(adjustedData, &server); err != nil {
+		return nil, err
+	}
+
+	return &server, nil
+}
+
 func (t *ServerInstance) List() (*[]Server, error) {
 	body, err := t.client.HttpRequest("servers", "GET")
 	if err != nil {
@@ -103,7 +137,7 @@ func (t *ServerInstance) Get(uuid string) (*Server, error) {
 		return nil, err
 	}
 
-	return client.DecodeResponse(body, &Server{})
+	return t.DecodeServerResponse(body)
 }
 
 type CreateServerDTO struct {
