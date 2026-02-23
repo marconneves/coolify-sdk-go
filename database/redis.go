@@ -1,7 +1,13 @@
 package database
 
-import "github.com/marconneves/coolify-sdk-go/client"
+import (
+	"context"
+	"fmt"
 
+	"github.com/marconneves/coolify-sdk-go/client"
+)
+
+// CreateDatabaseRedisDTO represents the data required to create a Redis database.
 type CreateDatabaseRedisDTO struct {
 	ServerUUID      string  `json:"server_uuid"`
 	ProjectUUID     string  `json:"project_uuid"`
@@ -26,24 +32,26 @@ type CreateDatabaseRedisDTO struct {
 	LimitsCPUShares         *int    `json:"limits_cpu_shares,omitempty"`
 }
 
+// CreateDatabaseRedisResponse represents the response when creating a Redis database.
 type CreateDatabaseRedisResponse struct {
 	UUID string `json:"uuid"`
 }
 
-func (d *DatabaseInstance) CreateRedis(data *CreateDatabaseRedisDTO) (*string, error) {
+// CreateRedis creates a new Redis database instance.
+func (d *DatabaseInstance) CreateRedis(ctx context.Context, data *CreateDatabaseRedisDTO) (*string, error) {
 	buf, err := client.EncodeRequest(data)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to encode request: %w", err)
 	}
 
-	body, err := d.client.HttpRequest("databases/redis", "POST", *buf)
+	body, err := d.client.HttpRequestWithContext(ctx, "databases/redis", "POST", *buf)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create Redis database: %w", err)
 	}
 
 	response, err := client.DecodeResponse(body, &CreateDatabaseRedisResponse{})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
 	return &response.UUID, nil

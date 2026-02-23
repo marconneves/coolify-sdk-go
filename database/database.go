@@ -2,6 +2,7 @@ package database
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 
@@ -9,14 +10,17 @@ import (
 	"github.com/marconneves/coolify-sdk-go/server"
 )
 
+// DatabaseInstance provides methods to interact with database resources.
 type DatabaseInstance struct {
 	client *client.Client
 }
 
+// NewDatabaseInstance creates a new DatabaseInstance.
 func NewDatabaseInstance(client *client.Client) *DatabaseInstance {
 	return &DatabaseInstance{client: client}
 }
 
+// Database represents a Coolify database entity.
 type Database struct {
 	UUID          string  `json:"uuid"`
 	Name          string  `json:"name"`
@@ -61,6 +65,7 @@ type Database struct {
 
 	MysqlConf         *string `json:"mysql_conf"`
 	MysqlDatabase     *string `json:"mysql_database,omitempty"`
+	MysqlPassword     *string `json:"mysql_password,omitempty"`
 	MysqlRootPassword *string `json:"mysql_root_password,omitempty"`
 	MysqlUser         *string `json:"mysql_user,omitempty"`
 
@@ -103,67 +108,97 @@ type Destination struct {
 	UUID      string        `json:"uuid"`
 }
 
-func (d *DatabaseInstance) List() (*[]Database, error) {
-	body, err := d.client.HttpRequest("databases", "GET")
+// List retrieves all database instances.
+func (d *DatabaseInstance) List(ctx context.Context) (*[]Database, error) {
+	body, err := d.client.HttpRequestWithContext(ctx, "databases", "GET")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to list databases: %w", err)
 	}
 
-	return client.DecodeResponse(body, &[]Database{})
+	res, err := client.DecodeResponse(body, &[]Database{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode databases list: %w", err)
+	}
+
+	return res, nil
 }
 
-func (d *DatabaseInstance) Get(uuid string) (*Database, error) {
+// Get retrieves a specific database instance by UUID.
+func (d *DatabaseInstance) Get(ctx context.Context, uuid string) (*Database, error) {
 	if uuid == "" {
 		return nil, errors.New("UUID is required")
 	}
 
-	body, err := d.client.HttpRequest(fmt.Sprintf("databases/%v", uuid), "GET")
+	body, err := d.client.HttpRequestWithContext(ctx, fmt.Sprintf("databases/%v", uuid), "GET")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get database %s: %w", uuid, err)
 	}
 
-	return client.DecodeResponse(body, &Database{})
+	res, err := client.DecodeResponse(body, &Database{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode database %s: %w", uuid, err)
+	}
+
+	return res, nil
 }
 
-func (d *DatabaseInstance) Start(uuid string) error {
+// Start starts a database instance.
+func (d *DatabaseInstance) Start(ctx context.Context, uuid string) error {
 	if uuid == "" {
 		return errors.New("UUID is required")
 	}
 
-	_, err := d.client.HttpRequest(fmt.Sprintf("databases/%v/start", uuid), "GET")
+	_, err := d.client.HttpRequestWithContext(ctx, fmt.Sprintf("databases/%v/start", uuid), "GET")
+	if err != nil {
+		return fmt.Errorf("failed to start database %s: %w", uuid, err)
+	}
 
-	return err
+	return nil
 }
 
-func (d *DatabaseInstance) Stop(uuid string) error {
+// Stop stops a database instance.
+func (d *DatabaseInstance) Stop(ctx context.Context, uuid string) error {
 	if uuid == "" {
 		return errors.New("UUID is required")
 	}
 
-	_, err := d.client.HttpRequest(fmt.Sprintf("databases/%v/stop", uuid), "GET")
+	_, err := d.client.HttpRequestWithContext(ctx, fmt.Sprintf("databases/%v/stop", uuid), "GET")
+	if err != nil {
+		return fmt.Errorf("failed to stop database %s: %w", uuid, err)
+	}
 
-	return err
+	return nil
 }
 
-func (d *DatabaseInstance) Restart(uuid string) error {
+// Restart restarts a database instance.
+func (d *DatabaseInstance) Restart(ctx context.Context, uuid string) error {
 	if uuid == "" {
 		return errors.New("UUID is required")
 	}
 
-	_, err := d.client.HttpRequest(fmt.Sprintf("databases/%v/restart", uuid), "GET", bytes.Buffer{})
+	_, err := d.client.HttpRequestWithContext(ctx, fmt.Sprintf("databases/%v/restart", uuid), "GET", bytes.Buffer{})
+	if err != nil {
+		return fmt.Errorf("failed to restart database %s: %w", uuid, err)
+	}
 
-	return err
+	return nil
 }
 
-func (d *DatabaseInstance) Delete(uuid string) error {
+// Delete removes a database instance.
+func (d *DatabaseInstance) Delete(ctx context.Context, uuid string) error {
 	if uuid == "" {
 		return errors.New("UUID is required")
 	}
 
-	_, err := d.client.HttpRequest(fmt.Sprintf("databases/%v", uuid), "DELETE", bytes.Buffer{})
-	return err
+	_, err := d.client.HttpRequestWithContext(ctx, fmt.Sprintf("databases/%v", uuid), "DELETE", bytes.Buffer{})
+	if err != nil {
+		return fmt.Errorf("failed to delete database %s: %w", uuid, err)
+	}
+
+	return nil
 }
 
+// UpdateDatabaseDTO represents the data required to update a database instance.
 type UpdateDatabaseDTO struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
@@ -200,6 +235,7 @@ type UpdateDatabaseDTO struct {
 
 	MysqlConf         *string `json:"mysql_conf,omitempty"`
 	MysqlDatabase     *string `json:"mysql_database,omitempty"`
+	MysqlPassword     *string `json:"mysql_password,omitempty"`
 	MysqlRootPassword *string `json:"mysql_root_password,omitempty"`
 	MysqlUser         *string `json:"mysql_user,omitempty"`
 
@@ -214,14 +250,18 @@ type UpdateDatabaseDTO struct {
 	RedisPassword *string `json:"redis_password,omitempty"`
 }
 
-func (d *DatabaseInstance) Update(uuid string, data *UpdateDatabaseDTO) error {
+// Update updates a database instance.
+func (d *DatabaseInstance) Update(ctx context.Context, uuid string, data *UpdateDatabaseDTO) error {
 	if uuid == "" {
 		return errors.New("UUID is required")
 	}
 	buf, err := client.EncodeRequest(data)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to encode update request: %w", err)
 	}
-	_, err = d.client.HttpRequest(fmt.Sprintf("databases/%v", uuid), "PATCH", *buf)
-	return err
+	_, err = d.client.HttpRequestWithContext(ctx, fmt.Sprintf("databases/%v", uuid), "PATCH", *buf)
+	if err != nil {
+		return fmt.Errorf("failed to update database %s: %w", uuid, err)
+	}
+	return nil
 }

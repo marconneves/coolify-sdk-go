@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -24,7 +25,14 @@ func NewClient(hostname string, apiToken string) *Client {
 	return client
 }
 
+// HttpRequest performs an HTTP request.
+// Deprecated: Use HttpRequestWithContext instead.
 func (client *Client) HttpRequest(path, method string, body ...bytes.Buffer) (closer io.ReadCloser, err error) {
+	return client.HttpRequestWithContext(context.Background(), path, method, body...)
+}
+
+// HttpRequestWithContext performs an HTTP request with context support.
+func (client *Client) HttpRequestWithContext(ctx context.Context, path, method string, body ...bytes.Buffer) (closer io.ReadCloser, err error) {
 	url := client.requestPath(path)
 	var bodyBuffer bytes.Buffer
 
@@ -32,9 +40,9 @@ func (client *Client) HttpRequest(path, method string, body ...bytes.Buffer) (cl
 		bodyBuffer = body[0]
 	}
 
-	req, err := http.NewRequest(method, url, &bodyBuffer)
+	req, err := http.NewRequestWithContext(ctx, method, url, &bodyBuffer)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	req.Header.Add("Authorization", "Bearer "+client.apiToken)
@@ -44,7 +52,7 @@ func (client *Client) HttpRequest(path, method string, body ...bytes.Buffer) (cl
 
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to perform request: %w", err)
 	}
 
 	if resp.StatusCode == http.StatusUnauthorized {

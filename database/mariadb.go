@@ -7,11 +7,12 @@ import (
 	"github.com/marconneves/coolify-sdk-go/client"
 )
 
-// CreateDatabasePostgresDTO represents the data required to create a PostgreSQL database.
-type CreateDatabasePostgresDTO struct {
+// CreateDatabaseMariaDBDTO represents the data required to create a MariaDB database.
+type CreateDatabaseMariaDBDTO struct {
 	ServerUUID      string  `json:"server_uuid"`
 	ProjectUUID     string  `json:"project_uuid"`
-	Environment     string  `json:"environment_name"`
+	EnvironmentName string  `json:"environment_name"`
+	EnvironmentUUID *string `json:"environment_uuid,omitempty"`
 	Name            *string `json:"name,omitempty"`
 	Description     *string `json:"description,omitempty"`
 	Image           *string `json:"image,omitempty"`
@@ -20,12 +21,11 @@ type CreateDatabasePostgresDTO struct {
 	InstantDeploy   *bool   `json:"instant_deploy,omitempty"`
 	DestinationUUID *string `json:"destination_uuid,omitempty"`
 
-	PostgresUser           *string `json:"postgres_user,omitempty"`
-	PostgresPassword       *string `json:"postgres_password,omitempty"`
-	PostgresDB             *string `json:"postgres_db,omitempty"`
-	PostgresInitdbArgs     *string `json:"postgres_initdb_args,omitempty"`
-	PostgresHostAuthMethod *string `json:"postgres_host_auth_method,omitempty"`
-	PostgresConf           *string `json:"postgres_conf,omitempty"`
+	MariadbConf         *string `json:"mariadb_conf,omitempty"`
+	MariadbRootPassword *string `json:"mariadb_root_password,omitempty"`
+	MariadbUser         *string `json:"mariadb_user,omitempty"`
+	MariadbPassword     *string `json:"mariadb_password,omitempty"`
+	MariadbDatabase     *string `json:"mariadb_database,omitempty"`
 
 	LimitsMemory            *string `json:"limits_memory,omitempty"`
 	LimitsMemorySwap        *string `json:"limits_memory_swap,omitempty"`
@@ -36,24 +36,24 @@ type CreateDatabasePostgresDTO struct {
 	LimitsCPUShares         *int    `json:"limits_cpu_shares,omitempty"`
 }
 
-// CreateDatabasePostgresResponse represents the response when creating a PostgreSQL database.
-type CreateDatabasePostgresResponse struct {
+// CreateDatabaseMariaDBResponse represents the response when creating a MariaDB database.
+type CreateDatabaseMariaDBResponse struct {
 	UUID string `json:"uuid"`
 }
 
-// CreatePostgreSQL creates a new PostgreSQL database instance.
-func (d *DatabaseInstance) CreatePostgreSQL(ctx context.Context, data *CreateDatabasePostgresDTO) (*string, error) {
+// CreateMariaDB creates a new MariaDB database instance.
+func (d *DatabaseInstance) CreateMariaDB(ctx context.Context, data *CreateDatabaseMariaDBDTO) (*string, error) {
 	buf, err := client.EncodeRequest(data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to encode request: %w", err)
 	}
 
-	body, err := d.client.HttpRequestWithContext(ctx, "databases/postgresql", "POST", *buf)
+	body, err := d.client.HttpRequestWithContext(ctx, "databases/mariadb", "POST", *buf)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create PostgreSQL database: %w", err)
+		return nil, fmt.Errorf("failed to create MariaDB database: %w", err)
 	}
 
-	response, err := client.DecodeResponse(body, &CreateDatabasePostgresResponse{})
+	response, err := client.DecodeResponse(body, &CreateDatabaseMariaDBResponse{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
