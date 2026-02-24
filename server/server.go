@@ -25,7 +25,7 @@ type Server struct {
 	Description                   *string   `json:"description"`
 	HighDiskUsageNotificationSent bool      `json:"high_disk_usage_notification_sent"`
 	LogDrainNotificationSent      bool      `json:"log_drain_notification_sent"`
-	Port                          string    `json:"port"`
+	Port                          int       `json:"port"`
 	PrivateKeyID                  int       `json:"private_key_id"`
 	Proxy                         *Proxy    `json:"proxy"`
 	Settings                      *Settings `json:"settings"`
