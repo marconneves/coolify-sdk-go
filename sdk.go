@@ -7,6 +7,7 @@ import (
 
 	client "github.com/marconneves/coolify-sdk-go/client"
 
+	application "github.com/marconneves/coolify-sdk-go/application"
 	database "github.com/marconneves/coolify-sdk-go/database"
 	server "github.com/marconneves/coolify-sdk-go/server"
 )
@@ -15,12 +16,13 @@ type Sdk struct {
 	Client     client.Client
 	httpClient *http.Client
 
-	Api        *ApiInstance
-	Team       *TeamInstance
-	Server     *server.ServerInstance
-	PrivateKey *PrivateKeyInstance
-	Project    *ProjectInstance
-	Database   *database.DatabaseInstance
+	Api         *ApiInstance
+	Team        *TeamInstance
+	Server      *server.ServerInstance
+	PrivateKey  *PrivateKeyInstance
+	Project     *ProjectInstance
+	Database    *database.DatabaseInstance
+	Application *application.ApplicationInstance
 }
 
 func Init(hostname string, apiToken string) *Sdk {
@@ -36,6 +38,7 @@ func Init(hostname string, apiToken string) *Sdk {
 	sdk.Database = database.NewDatabaseInstance(&sdk.Client)
 	sdk.PrivateKey = &PrivateKeyInstance{client: &sdk.Client}
 	sdk.Project = &ProjectInstance{client: &sdk.Client}
+	sdk.Application = application.NewApplicationInstance(&sdk.Client)
 
 	return sdk
 }
